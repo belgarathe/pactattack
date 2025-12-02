@@ -1,0 +1,80 @@
+═══════════════════════════════════════════════════════════
+  HOW TO COMMIT IN CURSOR - SUPER SIMPLE GUIDE
+═══════════════════════════════════════════════════════════
+
+STEP 1: OPEN SOURCE CONTROL
+────────────────────────────
+• Look at the LEFT side of Cursor window
+• See a list of icons? Find the one with a BRANCH/TREE symbol
+• Click on it
+
+OR press: Ctrl + Shift + G (all at once)
+
+───────────────────────────────────────────────────────────
+
+STEP 2: YOU SHOULD SEE A PANEL
+───────────────────────────────
+After clicking, you'll see a panel that shows:
+• "Source Control" at the top
+• List of files below (your new deployment files)
+
+───────────────────────────────────────────────────────────
+
+STEP 3: ADD ALL FILES
+──────────────────────
+• Look for a "+" button (plus sign)
+• It might say "Stage All Changes" next to it
+• CLICK THE "+" button
+
+This adds all your files to be committed.
+
+───────────────────────────────────────────────────────────
+
+STEP 4: TYPE YOUR MESSAGE
+──────────────────────────
+• Look for a text box at the top that says "Message"
+• Click in that box
+• Type exactly: Add deployment configuration
+
+───────────────────────────────────────────────────────────
+
+STEP 5: COMMIT
+──────────────
+• Look for a CHECKMARK button (✓) or "Commit" button
+• Click it
+
+OR press: Ctrl + Enter
+
+───────────────────────────────────────────────────────────
+
+STEP 6: PUSH TO GITHUB
+───────────────────────
+• Look for three dots (...) at the top
+• Click the three dots
+• Click "Push" or "Push to..."
+
+OR look for a cloud/upload icon and click it
+
+───────────────────────────────────────────────────────────
+
+DONE! ✅
+────────
+Your files are now on GitHub!
+
+Check here: https://github.com/belgarathe/pactattack
+
+═══════════════════════════════════════════════════════════
+
+STUCK? WHERE ARE YOU?
+──────────────────────
+
+Tell me:
+• "I don't see Source Control" → Press Ctrl+Shift+G
+• "I don't see any files" → Make sure you saved all files
+• "I see files but can't click +" → Try clicking each file's + individually
+• "Commit button is grayed out" → Type a commit message first
+• "Push button doesn't work" → Commit first, then push
+• "Something else" → Describe what you see
+
+═══════════════════════════════════════════════════════════
+

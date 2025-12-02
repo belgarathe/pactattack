@@ -1,0 +1,430 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  name               String?
+  passwordHash       String
+  coins              Int                 @default(0) // Coins currency
+  role               Role                @default(USER)
+  isBot              Boolean             @default(false)
+  // Shipping address fields
+  addressLine1       String?
+  addressLine2       String?
+  city               String?
+  state              String?
+  postalCode         String?
+  country            String?
+  phone              String?
+  pulls              Pull[]
+  transactions       Transaction[]
+  sales              SaleHistory[]
+  cart               Cart?
+  orders             Order[]
+  battlesCreated     Battle[]            @relation("BattleCreator")
+  battlesWon         Battle[]            @relation("BattleWinner")
+  battleParticipants BattleParticipant[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model Box {
+  id              String          @id @default(cuid())
+  name            String
+  description     String          @db.Text
+  imageUrl        String
+  price           Int // in Coins
+  cardsPerPack    Int
+  games           CardGame[]      @default([MAGIC_THE_GATHERING])
+  isActive        Boolean         @default(true)
+  featured        Boolean         @default(false)
+  heroDisplayMode HeroDisplayMode @default(AUTO)
+  heroCardId      String?        @unique
+  heroCard        Card?           @relation("BoxHeroCard", fields: [heroCardId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  popularity      Int             @default(0) // Track opens count
+  cards           Card[]
+  boosterBoxes    BoosterBox[] // Booster boxes that can be drawn
+  pulls           Pull[]
+  battles         Battle[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Card {
+  id               String   @id @default(cuid())
+  scryfallId       String
+  multiverseId     String? // For Gatherer image fetching
+  name             String
+  setName          String
+  setCode          String
+  collectorNumber  String
+  rarity           String
+  imageUrlGatherer String // Primary from Gatherer
+  imageUrlScryfall String? // Fallback
+  colors           String[]
+  cmc              Int?
+  type             String
+  oracleText       String?  @db.Text
+
+  // Pricing from Cardmarket
+  priceLow         Decimal?  @db.Decimal(10, 2)
+  priceAvg         Decimal?  @db.Decimal(10, 2)
+  priceHigh        Decimal?  @db.Decimal(10, 2)
+  priceLastUpdated DateTime?
+
+  // Pull rate for this box
+  pullRate Decimal @db.Decimal(6, 3) // 0.001% to 100.000%
+
+  // Coin value (default: 1)
+  coinValue  Int      @default(1)
+  sourceGame CardGame @default(MAGIC_THE_GATHERING)
+
+  boxId        String
+  box          Box            @relation(fields: [boxId], references: [id], onDelete: Cascade)
+  heroForBox   Box?           @relation("BoxHeroCard")
+  pulls        Pull[]
+  priceHistory PriceHistory[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([scryfallId, boxId])
+  @@index([boxId])
+  @@index([name])
+  @@index([rarity])
+}
+
+model BoosterBox {
+  id               String    @id @default(cuid())
+  catalogId        String?
+  catalog          SealedProductCatalog? @relation(fields: [catalogId], references: [id])
+  name             String
+  description      String    @db.Text
+  imageUrl         String
+  setName          String? // MTG set name
+  setCode          String? // MTG set code
+  productType      SealedProductType @default(UNKNOWN)
+  game             CardGame?
+  // Pricing
+  priceLow         Decimal?  @db.Decimal(10, 2)
+  priceAvg         Decimal?  @db.Decimal(10, 2)
+  priceHigh        Decimal?  @db.Decimal(10, 2)
+  priceLastUpdated DateTime?
+  // Pull rate for the box this booster box belongs to (if assigned to a box)
+  pullRate         Decimal   @db.Decimal(6, 3) // 0.001% to 100.000%
+  // Diamond Coin value (default: 1)
+  diamondCoinValue Int       @default(1)
+  // Which box can contain this booster box (optional - can be standalone)
+  boxId            String?
+  box              Box?      @relation(fields: [boxId], references: [id], onDelete: Cascade)
+  pulls            Pull[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([boxId])
+  @@index([name])
+  @@index([catalogId])
+  @@index([game])
+}
+
+model SealedProductCatalog {
+  id                  String              @id @default(cuid())
+  slug                String              @unique
+  name                String
+  setName             String?
+  setCode             String?
+  game                CardGame            @default(MAGIC_THE_GATHERING)
+  productType         SealedProductType   @default(UNKNOWN)
+  imageUrl            String
+  backgroundImageUrl  String?
+  description         String?             @db.Text
+  contents            String?             @db.Text
+  releaseDate         DateTime?
+  msrp                Decimal?            @db.Decimal(10, 2)
+  priceAvg            Decimal?            @db.Decimal(10, 2)
+  tcgplayerId         Int?
+  cardmarketProductId Int?
+  sourceUri           String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  boosterBoxes        BoosterBox[]
+
+  @@index([setCode])
+  @@index([productType])
+  @@index([game])
+}
+
+model Pull {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  boxId        String
+  box          Box         @relation(fields: [boxId], references: [id])
+  cardId       String? // Optional - can be null if boosterBoxId is set
+  card         Card?       @relation(fields: [cardId], references: [id])
+  boosterBoxId String? // Optional - can be null if cardId is set
+  boosterBox   BoosterBox? @relation(fields: [boosterBoxId], references: [id])
+  cardValue    Decimal?    @db.Decimal(10, 2) // Value at time of pull
+  timestamp    DateTime    @default(now())
+  cartItem     CartItem? // Can be in cart
+  orderItems   OrderItem[] // Can be in orders
+  battlePull   BattlePull? // Can be in a battle
+
+  @@index([userId])
+  @@index([timestamp])
+}
+
+model Transaction {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  amount          Decimal       @db.Decimal(10, 2)
+  coins           Int
+  stripePaymentId String?       @unique
+  status          PaymentStatus
+  timestamp       DateTime      @default(now())
+
+  @@index([userId])
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id])
+  price     Decimal  @db.Decimal(10, 2)
+  source    String // "cardmarket"
+  timestamp DateTime @default(now())
+
+  @@index([cardId, timestamp])
+}
+
+model SaleHistory {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  cardId        String
+  cardName      String
+  cardImage     String?
+  coinsReceived Int // Coins received for the sale
+  timestamp     DateTime @default(now())
+
+  @@index([userId])
+  @@index([timestamp])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum CardGame {
+  MAGIC_THE_GATHERING
+  ONE_PIECE
+  POKEMON
+  LORCANA
+}
+
+enum HeroDisplayMode {
+  AUTO
+  CARD
+  SEALED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  pullId    String   @unique // One card per cart item
+  pull      Pull     @relation(fields: [pullId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cartId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  orderNumber     String      @unique // Human-readable order number
+  items           OrderItem[]
+  subtotal        Decimal     @db.Decimal(10, 2) // Card value total
+  shipping        Decimal     @db.Decimal(10, 2) // Shipping cost (5 EUR)
+  total           Decimal     @db.Decimal(10, 2) // Total amount
+  stripePaymentId String?     @unique
+  status          OrderStatus @default(PENDING)
+  shippingAddress String?     @db.Text // JSON string with address
+  trackingNumber  String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  pullId    String
+  pull      Pull     @relation(fields: [pullId], references: [id])
+  cardName  String
+  cardImage String?
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+enum OrderStatus {
+  PENDING // Order created, awaiting payment
+  PAID // Payment received, processing
+  PROCESSING // Cards being prepared
+  SHIPPED // Cards shipped
+  DELIVERED // Cards delivered
+  CANCELLED // Order cancelled
+  REFUNDED // Order refunded
+}
+
+model Battle {
+  id                String              @id @default(cuid())
+  creatorId         String
+  creator           User                @relation("BattleCreator", fields: [creatorId], references: [id])
+  boxId             String
+  box               Box                 @relation(fields: [boxId], references: [id])
+  entryFee          Int                 @default(0) // Entry fee in coins (Battle Price)
+  maxParticipants   Int                 @default(4) // Maximum 4 participants (1vs1vs1vs1)
+  rounds            Int                 @default(1) // Number of rounds (1, 5, 6, 7, etc.)
+  battleMode        BattleMode          @default(NORMAL) // Battle mode: NORMAL, UPSIDE_DOWN, JACKPOT
+  format            BattleFormat        @default(SOLO)
+  teamSize          Int                 @default(1)
+  teamCount         Int                 @default(1)
+  winningTeamNumber Int?
+  shareMode         Boolean             @default(false) // Share mode enabled
+  status            BattleStatus        @default(WAITING)
+  winnerId          String? // Winner user ID
+  winner            User?               @relation("BattleWinner", fields: [winnerId], references: [id])
+  totalPrize        Int                 @default(0) // Total coin value of all cards
+  participants      BattleParticipant[]
+  pulls             BattlePull[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  startedAt         DateTime?
+  finishedAt        DateTime?
+
+  @@index([status])
+  @@index([creatorId])
+  @@index([battleMode])
+}
+
+model BattleParticipant {
+  id           String       @id @default(cuid())
+  battleId     String
+  battle       Battle       @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  totalValue   Int          @default(0) // Total coin value of all their pulls across all rounds
+  roundsPulled Int          @default(0) // Number of rounds they've pulled (0 to battle.rounds)
+  teamNumber   Int?
+  joinedAt     DateTime     @default(now())
+  pulls        BattlePull[]
+
+  @@unique([battleId, userId])
+  @@index([battleId])
+  @@index([userId])
+}
+
+model BattlePull {
+  id            String            @id @default(cuid())
+  battleId      String
+  battle        Battle            @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   BattleParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  pullId        String?           @unique // Reference to the actual Pull (nullable once card released)
+  pull          Pull?             @relation(fields: [pullId], references: [id])
+  roundNumber   Int // Which round this pull belongs to (1, 2, 3, etc.)
+  coinValue     Int // Coin value at time of pull
+  pulledAt      DateTime          @default(now())
+  itemType      BattleItemType    @default(CARD)
+  itemName      String?
+  itemImage     String?
+  itemSetName   String?
+  itemRarity    String?
+  cardId        String?
+  boosterBoxId  String?
+
+  @@index([battleId])
+  @@index([participantId])
+  @@index([battleId, roundNumber])
+}
+
+enum BattleStatus {
+  WAITING // Waiting for participants to join
+  IN_PROGRESS // Battle started, participants pulling
+  FINISHED // Battle completed, winner determined
+  CANCELLED // Battle cancelled
+}
+
+enum BattleMode {
+  NORMAL // Highest total value wins
+  UPSIDE_DOWN // Lowest total value wins
+  JACKPOT // Special jackpot mode (highest single pull wins)
+}
+
+enum BattleFormat {
+  SOLO
+  TEAM
+}
+
+enum BattleItemType {
+  CARD
+  BOOSTER_BOX
+}
+
+enum SealedProductType {
+  SET_BOOSTER_DISPLAY
+  DRAFT_BOOSTER_DISPLAY
+  COLLECTOR_BOOSTER_DISPLAY
+  PLAY_BOOSTER_DISPLAY
+  BUNDLE
+  GIFT_BUNDLE
+  STARTER_KIT
+  PRERELEASE_PACK
+  SET_BOOSTER_PACK
+  DRAFT_BOOSTER_PACK
+  COLLECTOR_BOOSTER_PACK
+  PLAY_BOOSTER_PACK
+  COMMANDER_DECK
+  COMPLETE_BUNDLE
+  ACCESSORY
+  BOOSTER_BOX
+  BOOSTER_PACK
+  STARTER_DECK
+  UNKNOWN
+}

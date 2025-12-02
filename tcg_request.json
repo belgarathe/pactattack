@@ -1,0 +1,41 @@
+﻿{
+  "algorithm": "sales_dismax",
+  "from": 0,
+  "size": 24,
+  "filters": {
+    "term": {
+      "productLineName": ["magic"]
+    },
+    "range": {},
+    "match": {}
+  },
+  "listingSearch": {
+    "context": {
+      "cart": {}
+    },
+    "filters": {
+      "term": {
+        "sellerStatus": "Live",
+        "channelId": 0
+      },
+      "range": {
+        "quantity": {
+          "gte": 1
+        }
+      },
+      "exclude": {
+        "channelExclusion": 0
+      }
+    }
+  },
+  "context": {
+    "cart": {},
+    "shippingCountry": "DE",
+    "userProfile": {}
+  },
+  "settings": {
+    "useFuzzySearch": true,
+    "didYouMean": {}
+  },
+  "sort": {}
+}
