@@ -1,0 +1,45 @@
+==========================================
+TEST DEPLOYMENT COMMANDS
+==========================================
+
+Server: 82.165.66.236
+App Path: /var/www/pactattack/pactattack
+
+==========================================
+OPTION 1: Plesk Git Deployment Action
+==========================================
+
+Copy this into Plesk Git → Deployment Actions:
+
+cd /var/www/pactattack/pactattack && git pull origin main && npm install && npm run db:generate && npm run build && (pm2 restart pactattack || (pm2 start npm --name "pactattack" -- start && pm2 save))
+
+==========================================
+OPTION 2: Plesk Scheduled Task
+==========================================
+
+Command:
+cd /var/www/pactattack/pactattack && git pull origin main && npm install && npm run db:generate && npm run build && (pm2 restart pactattack || (pm2 start npm --name "pactattack" -- start && pm2 save))
+
+==========================================
+OPTION 3: Via SSH (if connection works)
+==========================================
+
+From PowerShell:
+ssh -i $env:USERPROFILE\.ssh\id_ed25519_pactattack root@82.165.66.236 "cd /var/www/pactattack/pactattack && git pull origin main && npm install && npm run db:generate && npm run build && (pm2 restart pactattack || (pm2 start npm --name 'pactattack' -- start && pm2 save))"
+
+==========================================
+OPTION 4: Full Deployment Script
+==========================================
+
+Download and run from GitHub:
+cd /tmp && curl -fsSL https://raw.githubusercontent.com/belgarathe/pactattack/main/pactattack/deploy-with-ssh-key-setup.sh -o deploy.sh && chmod +x deploy.sh && bash deploy.sh
+
+==========================================
+QUICK TEST COMMAND (Minimal)
+==========================================
+
+Just update and restart:
+cd /var/www/pactattack/pactattack && git pull && npm install && npm run build && pm2 restart pactattack
+
+==========================================
+
