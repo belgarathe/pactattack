@@ -386,6 +386,7 @@ export async function POST(
       if (battle.format === 'TEAM' && winningParticipants.length > 1) {
         let winnerIndex = 0;
         for (const battlePull of battlePulls) {
+          if (!battlePull.pullId) continue;
           const recipient = winningParticipants[winnerIndex % winningParticipants.length];
           await tx.pull.update({
             where: { id: battlePull.pullId },
@@ -395,6 +396,7 @@ export async function POST(
         }
       } else {
         for (const battlePull of battlePulls) {
+          if (!battlePull.pullId) continue;
           await tx.pull.update({
             where: { id: battlePull.pullId },
             data: { userId: primaryParticipant.userId },
