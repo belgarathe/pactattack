@@ -1,0 +1,36 @@
+==========================================
+PLESK GIT DEPLOYMENT ACTION - ONE LINER
+==========================================
+
+Copy and paste this EXACT command into your Plesk Git
+"Deployment Action" window:
+
+==========================================
+
+cd /tmp && curl -fsSL https://raw.githubusercontent.com/belgarathe/pactattack/main/pactattack/deploy-complete-secure.sh -o deploy.sh && chmod +x deploy.sh && bash deploy.sh
+
+==========================================
+
+This will:
+1. Download the comprehensive deployment script from GitHub
+2. Make it executable
+3. Run the complete secure deployment
+
+The script handles:
+✅ Creating non-root user
+✅ Securing SSH
+✅ Configuring firewall
+✅ Installing all dependencies
+✅ Setting up database
+✅ Deploying application
+✅ Configuring nginx
+✅ Starting with PM2
+
+==========================================
+
+ALTERNATIVE: If you want to use the existing simpler deployment:
+
+cd /var/www/pactattack/pactattack && npm install && npm run db:generate && npm run build && (pm2 restart pactattack || (pm2 start npm --name "pactattack" -- start && pm2 save))
+
+==========================================
+
