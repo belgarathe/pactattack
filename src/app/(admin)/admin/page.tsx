@@ -26,7 +26,7 @@ async function getAdminStats() {
     totalUsers,
     totalBoxes,
     totalPulls,
-    totalRevenue: totalRevenue._sum.amount || 0,
+    totalRevenue: totalRevenue._sum.amount ? Number(totalRevenue._sum.amount) : 0,
   };
 }
 

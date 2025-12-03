@@ -283,7 +283,7 @@ function EditBoxPageClient({ boxId }: { boxId: string }) {
 
   const handleHeroCardSelect = (card: BoxCardData) => {
     setHeroCardSelection({
-      cardId: card.id ?? null,
+      cardId: (card as BoxCardData & { id?: string }).id ?? null,
       scryfallId: card.scryfallId,
     });
   };

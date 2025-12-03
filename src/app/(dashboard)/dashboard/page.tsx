@@ -81,7 +81,7 @@ async function getDashboardData(userId: string) {
         : 0;
       return sum + productValue;
     }
-    return sum + cardValue;
+    return sum + 0;
   }, 0);
 
   return {
@@ -179,10 +179,10 @@ export default async function DashboardPage() {
               <>
                 <p className="font-semibold">{stats.rarestCard.name}</p>
                 <p className="text-sm text-muted">{stats.rarestCard.setName}</p>
-                {stats.rarestCard.priceAvg ? (
+                {stats.rarestCard.value > 0 ? (
                   <>
                     <p className="mt-2 text-success font-semibold">
-                      {formatCurrency(Number(stats.rarestCard.priceAvg))}
+                      {formatCurrency(stats.rarestCard.value)}
                     </p>
                     <p className="text-xs text-muted">Cardmarket value</p>
                   </>

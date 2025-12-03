@@ -28,6 +28,9 @@ export default async function AdminSealedProductsPage() {
     ...product,
     priceAvg: product.priceAvg ? Number(product.priceAvg) : null,
     msrp: product.msrp ? Number(product.msrp) : null,
+    releaseDate: product.releaseDate ? product.releaseDate.toISOString() : null,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
   }));
 
   return (
@@ -42,6 +45,8 @@ export default async function AdminSealedProductsPage() {
     </div>
   );
 }
+
+
 
 
 
