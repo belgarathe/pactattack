@@ -17,7 +17,7 @@ type ImageSourceOption = {
   kind?: 'artwork' | 'scan' | 'render' | 'unknown';
 };
 
-interface CardData {
+interface BoxCardData {
   id?: string;
   scryfallId: string;
   multiverseId?: string;
@@ -94,7 +94,7 @@ export default function CreateBoxPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'info' | 'cards'>('info');
   const [boxId, setBoxId] = useState<string | null>(null);
-  const [cards, setCards] = useState<CardData[]>([]);
+  const [cards, setCards] = useState<BoxCardData[]>([]);
   const [sealedProducts, setSealedProducts] = useState<BoxSealedProduct[]>([]);
   const [heroCardSelection, setHeroCardSelection] = useState<{
     cardId: string | null;
@@ -159,7 +159,7 @@ export default function CreateBoxPage() {
     });
   };
 
-  const handleHeroCardSelect = (card: CardData) => {
+  const handleHeroCardSelect = (card: BoxCardData) => {
     setHeroCardSelection({
       cardId: card.id ?? null,
       scryfallId: card.scryfallId,

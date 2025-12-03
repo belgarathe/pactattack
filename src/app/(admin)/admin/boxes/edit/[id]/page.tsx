@@ -17,7 +17,8 @@ type ImageSourceOption = {
   kind?: 'artwork' | 'scan' | 'render' | 'unknown';
 };
 
-interface CardData {
+interface BoxCardData {
+  id?: string; // Card ID from database
   scryfallId: string;
   multiverseId?: string;
   name: string;
@@ -133,7 +134,7 @@ function EditBoxPageClient({ boxId }: { boxId: string }) {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [step, setStep] = useState<'info' | 'cards'>('info');
-  const [cards, setCards] = useState<CardData[]>([]);
+  const [cards, setCards] = useState<BoxCardData[]>([]);
   const [sealedProducts, setSealedProducts] = useState<BoxSealedProduct[]>([]);
   const [heroCardSelection, setHeroCardSelection] = useState<{
     cardId: string | null;
@@ -191,7 +192,7 @@ function EditBoxPageClient({ boxId }: { boxId: string }) {
         setBoxGames(box.games && box.games.length ? box.games : DEFAULT_GAMES);
 
         // Transform cards to CardData format
-        const transformedCards: CardData[] = (box.cards as SerializedBoxCard[]).map((card) => ({
+        const transformedCards: BoxCardData[] = (box.cards as SerializedBoxCard[]).map((card) => ({
           id: card.id, // Include card ID for auto-save
           scryfallId: card.scryfallId,
           multiverseId: card.multiverseId || undefined,
@@ -280,7 +281,7 @@ function EditBoxPageClient({ boxId }: { boxId: string }) {
     });
   };
 
-  const handleHeroCardSelect = (card: CardData) => {
+  const handleHeroCardSelect = (card: BoxCardData) => {
     setHeroCardSelection({
       cardId: card.id ?? null,
       scryfallId: card.scryfallId,
