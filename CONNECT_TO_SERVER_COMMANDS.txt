@@ -1,0 +1,51 @@
+==========================================
+CONNECT TO SERVER COMMANDS
+==========================================
+
+Server: 82.165.66.236
+User: root
+
+==========================================
+OPTION 1: Connect with New SSH Key
+==========================================
+
+(Use this AFTER adding your public key to the server)
+
+PowerShell:
+ssh -i $env:USERPROFILE\.ssh\id_ed25519_pactattack root@82.165.66.236
+
+Command Prompt (CMD):
+ssh -i %USERPROFILE%\.ssh\id_ed25519_pactattack root@82.165.66.236
+
+==========================================
+OPTION 2: Connect with Password
+==========================================
+
+(Use this if SSH key is not yet added to server)
+
+PowerShell:
+ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no root@82.165.66.236
+
+Password: Lordamun1948kickboard
+
+==========================================
+OPTION 3: Connect with Old SSH Key
+==========================================
+
+(If you want to try the old key)
+
+PowerShell:
+ssh -i $env:USERPROFILE\.ssh\id_rsa root@82.165.66.236
+
+==========================================
+QUICK COPY-PASTE COMMANDS
+==========================================
+
+# New Key (Recommended - after adding to server):
+ssh -i $env:USERPROFILE\.ssh\id_ed25519_pactattack root@82.165.66.236
+
+# Password Auth (If key not added yet):
+ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no root@82.165.66.236
+
+==========================================
+

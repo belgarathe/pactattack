@@ -1,0 +1,57 @@
+==========================================
+NEW SSH KEY PAIR CREATED
+==========================================
+
+Key Type: ED25519 (Modern, Secure)
+Created: 2025-12-03
+Purpose: PactAttack Server Deployment
+
+==========================================
+KEY LOCATIONS
+==========================================
+
+Private Key:
+C:\Users\Devian\.ssh\id_ed25519_pactattack
+
+Public Key:
+C:\Users\Devian\.ssh\id_ed25519_pactattack.pub
+
+==========================================
+YOUR PUBLIC KEY
+==========================================
+
+Copy this entire line and add it to the server's authorized_keys:
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFQi3Zg50UnnNZyrLOCJ2SxjjV1wiKw3pSqF/uIofi5f pactattack-deployment-20251203
+
+==========================================
+
+HOW TO ADD THIS KEY TO SERVER:
+==========================================
+
+OPTION 1: Via Plesk File Manager (Easiest)
+1. Login to Plesk
+2. Go to Files  File Manager
+3. Navigate to /root/.ssh/
+4. Edit authorized_keys
+5. Paste the public key above
+6. Save
+7. Set permissions: chmod 600 /root/.ssh/authorized_keys
+
+OPTION 2: Via Plesk Terminal
+Run this command in Plesk Terminal:
+
+mkdir -p ~/.ssh
+echo 'PASTE_PUBLIC_KEY_HERE' >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+
+==========================================
+TEST CONNECTION AFTER ADDING KEY:
+==========================================
+
+From PowerShell, run:
+
+ssh -i $env:USERPROFILE\.ssh\id_ed25519_pactattack root@82.165.66.236
+
+==========================================
