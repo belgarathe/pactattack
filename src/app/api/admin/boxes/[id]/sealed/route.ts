@@ -243,7 +243,7 @@ export async function POST(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid payload', details: error.errors },
+        { error: 'Invalid payload', details: error.issues },
         { status: 400 }
       );
     }

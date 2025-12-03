@@ -255,12 +255,12 @@ export async function POST(
     return NextResponse.json({ success: true, message: 'Cards added successfully' });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Validation error:', error.errors);
-      const errorMessages = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      console.error('Validation error:', error.issues);
+      const errorMessages = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       return NextResponse.json(
         { 
           error: 'Invalid card data', 
-          details: error.errors,
+          details: error.issues,
           message: `Validation failed: ${errorMessages}`
         }, 
         { status: 400 }
